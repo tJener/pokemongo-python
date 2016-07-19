@@ -86,6 +86,7 @@ class Skiplagged():
                     return json.loads(r.content)
                 else:
                     r = requests_session.post(endpoint, base64.b64decode(data), verify=False)
+                    if 'Server Error' in r.content: raise Exception('invalid niantic server response')
                     return base64.b64encode(r.content)  
             except Exception:
                 print "post exception", traceback.format_exc()
