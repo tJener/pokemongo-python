@@ -48,7 +48,7 @@ class Skiplagged():
         return self._update_login(auth_provider, access_token, username, password)
     
     def _update_login(self, auth_provider, access_token, username, password):        
-        if self._access_token:
+        if access_token:
             self._auth_provider = auth_provider
             self._access_token = str(access_token)
             self._username = username
