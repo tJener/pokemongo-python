@@ -92,7 +92,9 @@ class Skiplagged():
                 time.sleep(1)
     
     def get_specific_api_endpoint(self):
-        print time.time(), "called get_specific_api_endpoint" 
+        print time.time(), "called get_specific_api_endpoint"
+        if not self.is_logged_in(): raise Exception('need to log in first')
+        
         response = self._call(self.SKIPLAGGED_API, {
                                                     'access_token': self.get_access_token(), 
                                                     'auth_provider': self.get_auth_provider()
