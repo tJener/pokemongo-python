@@ -79,7 +79,7 @@ class Skiplagged():
         is_skiplagged_api = 'skiplagged' in endpoint
         requests_session = self._requests_skiplagged_session if is_skiplagged_api else self._requests_niantic_session
         
-        for _ in xrange(3):
+        while 1:
             try:
                 if is_skiplagged_api:
                     r = requests_session.post(endpoint, data, verify=False)
