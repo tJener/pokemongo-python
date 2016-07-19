@@ -111,7 +111,7 @@ class Skiplagged():
                                                     'auth_provider': self.get_auth_provider(),
                                                     'pdata': response
                                                     })
-        if not 'api_endpoint' in response: raise Exception('failed to retrieve specific api endpoint')
+        if not 'api_endpoint' in response or not response['api_endpoint']: raise Exception('failed to retrieve specific api endpoint')
         self.SPECIFIC_API = response['api_endpoint']
         return self.SPECIFIC_API
         
