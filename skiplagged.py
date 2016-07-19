@@ -2,6 +2,7 @@ import base64
 import json
 import time
 import traceback
+import requests
 
 from auth.google import Google
 from auth.pokemon_trainer_club import PokemonTrainerClub
@@ -157,7 +158,7 @@ class Skiplagged():
                                                     'step_size': step_size
                                                     })
         if not 'requests' in response: raise Exception('failed to get requests')
-                
+                        
         for request in response['requests']:
             print time.time(), "moving player"
             pokemon_data = self._call(self.SPECIFIC_API, request['pdata'])
@@ -169,3 +170,13 @@ class Skiplagged():
             
             time.sleep(.5)
             
+    def get_bounds_for_address(self, address):
+        url = 'https://maps.googleapis.com/maps/api/geocode/json'
+        params = {'sensor': 'false', 'address': address}
+        r = requests.get(url, params=params)
+        results = r.json()['results']
+        bounds = results[0]['geometry']['viewport']
+        return (
+                (bounds['southwest']['lat'], bounds['southwest']['lng']),
+                (bounds['northeast']['lat'], bounds['northeast']['lng']),
+                )
