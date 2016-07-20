@@ -4,6 +4,12 @@ A Python module that makes it easy to communicate with the Pokemon Go API.
 Take a look at `example.py`
 
 ## Instantly view spawned pokemon
+
+### Live Map
+
+[https://skiplagged.com/pokemon](https://skiplagged.com/pokemon)
+
+### API
 [Central Park, New York, NY](http://skiplagged.com/api/pokemon.php?address=central%20park,%20new%20york,%20ny)
 
 ```
