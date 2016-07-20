@@ -172,13 +172,13 @@ class Skiplagged():
             
             time.sleep(.5)
             
-    def get_bounds_for_address(self, address):
+    def get_bounds_for_address(self, address, offset=0.002):
         url = 'https://maps.googleapis.com/maps/api/geocode/json'
         params = {'sensor': 'false', 'address': address}
         r = requests.get(url, params=params)
         results = r.json()['results']
         bounds = results[0]['geometry']['viewport']
         return (
-                (bounds['southwest']['lat'], bounds['southwest']['lng']),
-                (bounds['northeast']['lat'], bounds['northeast']['lng']),
+                (bounds['southwest']['lat'] - offset, bounds['southwest']['lng'] - offset),
+                (bounds['northeast']['lat'] + offset, bounds['northeast']['lng'] + offset),
                 )
