@@ -67,7 +67,7 @@ class FindPokemon(argparse.Namespace):
                 for pokemon in client.find_pokemon(bounds):
                     print pokemon
             except Exception as e:
-                print('Unexpected error: {0}'.format(e))
+                print('Unexpected error: {0} {1}'.format(e.message, e.args))
                 time.sleep(1)
 
 def main():
