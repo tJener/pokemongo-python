@@ -65,6 +65,18 @@ if __name__ == '__main__':
                     if expiration + EXPIRATION_ERROR < current_time:
                         del noteworthy[key]
 
+                try:
+                    _start = time.strptime(config.get('slack', 'workday_blackout_start'), '%I:%M %p')
+                    _end   = time.strptime(config.get('slack', 'workday_blackout_end'),   '%I:%M %p')
+                    now = time.localtime()
+                    blackout_start = time.mktime((now[0], now[1], now[2], _start[3], _start[4], _start[5], now[6], now[7], now[8]))
+                    blackout_end = time.mktime((now[0], now[1], now[2], _end[3], _end[4], _end[5], now[6], now[7], now[8]))
+                except Exception as e:
+                    blackout_start = 0
+                    blackout_end = 0
+
+                blackout = now[6] < 5 and blackout_start < current_time and current_time <= blackout_end
+
                 for pokemon in client.query_pokemon(bounds):
                     ploc = pokemon.get_location()
                     pid = pokemon.get_id()
@@ -78,19 +90,20 @@ if __name__ == '__main__':
                     if pid in SLACK_RADAR and dist < NOTIFY_RANGE and time.time() < expiration:
                         key = '%d%f%f' % (pokemon.get_id(), ploc['latitude'], ploc['longitude'])
                         if not key in noteworthy:
-                            body = ':poke%003d: %s spotted %dm %s, until %s (%ds remaining)' % (
-                                pid,
-                                pokemon.get_name(),
-                                int(dist),
-                                bearing,
-                                time.strftime("%I:%M:%S %p", time.localtime(expiration)),
-                                expiration - time.time()
-                            )
-                            payload = {
-                                'text': body,
-                                'icon_emoji': ':pokeball:'
-                            }
-                            requests.post(webhook_url, data=json.dumps(payload))
+                            if not blackout:
+                                body = ':poke%003d: %s spotted %dm %s, until %s (%ds remaining)' % (
+                                    pid,
+                                    pokemon.get_name(),
+                                    int(dist),
+                                    bearing,
+                                    time.strftime("%I:%M:%S %p", time.localtime(expiration)),
+                                    expiration - time.time()
+                                )
+                                payload = {
+                                    'text': body,
+                                    'icon_emoji': ':pokeball:'
+                                }
+                                requests.post(webhook_url, data=json.dumps(payload))
                             noteworthy[key] = {
                                 'expiration': expiration
                             }
