@@ -13,24 +13,24 @@ class PokemonTrainerClub(object):
     '''
     Allows for Pokemon Trainer Club (PTC) login
     '''
-    
+
     def get_auth_provider(self):
         return 'ptc'
 
     def get_access_token(self, username, password):
         requests_session = get_requests_session('niantic')
-        
+
         # Get LOGIN_URL page
         r = requests_session.get(LOGIN_URL)
         if r is None: raise Exception('failed to get login_url')
-        
+
         # Response should be in json
         try: login_data = json.loads(r.content)
         except Exception as e:
             print 'response from get login_url unexpected, retrying'
             time.sleep(1)
             return self.login_ptc(username, password)
-        
+
         # Attempt to log in
         data = {
             'lt': login_data['lt'],
@@ -40,12 +40,23 @@ class PokemonTrainerClub(object):
             'password': password,
         }
         r1 = requests_session.post(LOGIN_URL, data=data)
-    
+
+        if not r1.history:
+            error_code = r1.json().get('error_code', '')
+            if error_code == 'users.login.activation_required':
+                raise Exception(
+                    r1.json().get('errors', ['Account not yet activated'])[0] +
+                    ' ' +
+                    r1.json().get('redirect', '')
+                )
+            else:
+                raise Exception(r1.json())
+
         # If log in was successful, we should get ticket
         ticket = None
         try: ticket = re.sub('.*ticket=', '', r1.history[0].headers['Location'])
         except: raise Exception('failed to get ticket, ' + r1.json().get('errors', ''))
-        
+
         # Exchange the ticket for an access_token
         data1 = {
             'client_id': 'mobile-app_pokemon-go',
@@ -57,5 +68,5 @@ class PokemonTrainerClub(object):
         r2 = requests_session.post(LOGIN_OAUTH, data=data1)
         access_token = re.sub('&expires.*', '', r2.content)
         access_token = re.sub('.*access_token=', '', access_token)
-        
+
         return access_token
