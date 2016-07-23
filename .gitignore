@@ -5,3 +5,4 @@
 
 config/
 pokemon_notify_level.py
+slack-current-pokemon.json
