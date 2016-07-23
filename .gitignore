@@ -2,3 +2,6 @@
 .pydevproject
 *~
 *.pyc
+
+config/
+pokemon_notify_level.py

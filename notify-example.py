@@ -1,52 +1,30 @@
 import time
+import ConfigParser
 
 from skiplagged import Skiplagged
 from pushbullet import Pushbullet
 from utils.latlng import latlng_distance, find_bounds, get_cardinal_direction
 
 if __name__ == '__main__':
-    # BEGIN CONFIG
-    #
-    # If code scares you, only change stuff until it says END CONFIG
-    pushbullet_api_key = "o.xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
+    from pokemon_notify_level import UNCOMMONS, RARES, ULTRAS
 
-    ALWAYS_NOTIFY_RANGE = 45    # meters (fine, I'll open the app)
-    UNCOMMON_NOTIFY_RANGE = 200 # meters (what gets you off the couch?)
-    RARE_NOTIFY_RANGE = 1000    # meters (how fast can you walk?)
-    ULTRA_NOTIFY_RANGE = 2500   # meters (how fast can you sprint?)
+    config = ConfigParser.RawConfigParser()
+    config_path = 'config/default.cfg'
+    config.read(config_path)
 
-    home = { 'latitude': 42.000000, 'longitude': -72.000000 } # where are you
-
-    UNCOMMONS = (
-        1,                      # Bulbasaur
-        4,                      # Charmander
-        7,                      # Squirtle
-    )
-
-    RARES = (
-        2,                      # Ivysaur
-        5,                      # Charmeleon
-        8,                      # Wartortle
-        138, 139,               # Omanyte+
-        140, 141,               # Kabuto+
-        142,                    # Aerodactyl
-        143,                    # Snorlax
-        148, 149,               # Dragonair+
-    )
-
-    ULTRAS = (
-        3,                      # Venusaur
-        6,                      # Charizard
-        9,                      # Blastoise
-        122,                    # Mr. Mime
-        123,                    # Scyther
-        131,                    # Lapras
-        149,                    # Dragonite
-    )
-    # END CONFIG
+    ALWAYS_NOTIFY_RANGE   = config.getint('notify', 'always_range')
+    UNCOMMON_NOTIFY_RANGE = config.getint('notify', 'uncommon_range')
+    RARE_NOTIFY_RANGE     = config.getint('notify', 'rare_range')
+    ULTRA_NOTIFY_RANGE    = config.getint('notify', 'ultra_range')
 
     client = Skiplagged()
+    pushbullet_api_key = config.get('pushbullet', 'api_key')
     pb = Pushbullet(pushbullet_api_key)
+
+    home = {
+        'latitude':  config.getfloat('notify', 'location_lat'),
+        'longitude': config.getfloat('notify', 'location_lng')
+    }
 
     search_radius = max(
         ALWAYS_NOTIFY_RANGE,
