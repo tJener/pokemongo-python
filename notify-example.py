@@ -2,7 +2,7 @@ import time
 
 from skiplagged import Skiplagged
 from pushbullet import Pushbullet
-from utils.latlng import latlng_distance, find_bounds
+from utils.latlng import latlng_distance, find_bounds, get_cardinal_direction
 
 if __name__ == '__main__':
     # BEGIN CONFIG
@@ -100,6 +100,8 @@ if __name__ == '__main__':
 
                     dist = latlng_distance(home['latitude'], home['longitude'],
                                            ploc['latitude'], ploc['longitude'])
+                    bearing = get_cardinal_direction(home['latitude'], home['longitude'],
+                                                     ploc['latitude'], ploc['longitude'])
                     is_uncommon = pid in UNCOMMONS
                     is_rare = pid in RARES
                     is_ultra = pid in ULTRAS
@@ -112,7 +114,7 @@ if __name__ == '__main__':
                         key = '%d%f%f' % (pokemon.get_id(), ploc['latitude'], ploc['longitude'])
                         if not key in noteworthy:
                             print pokemon, 'distance: %.2f' % (dist)
-                            push = pb.push_link('[pogo] %s %.2fm' % (pokemon.get_name(), dist),
+                            push = pb.push_link('[pogo] %s %dm %s' % (pokemon.get_name(), int(dist), bearing),
                                                 "https://skiplagged.com/pokemon",
                                                 body='%s|%f' % (key, expiration))
                             noteworthy[key] = {
