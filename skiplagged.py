@@ -168,9 +168,12 @@ class Skiplagged():
             pokemon_data = self._call(self.SPECIFIC_API, request['pdata'])
             response = self._call(self.SKIPLAGGED_API, {'pdata': pokemon_data})
             
-            num_pokemon_found = len(response['pokemons'])
-            if num_pokemon_found > 0: print getMyTime(), "found %d pokemon" % (num_pokemon_found)
-            for pokemon in response['pokemons']: yield Pokemon(pokemon )
+            if 'pokemons' in response:
+	        num_pokemon_found = len(response['pokemons'])
+                if num_pokemon_found > 0: print getMyTime(), "found %d pokemon" % (num_pokemon_found)
+                for pokemon in response['pokemons']: yield Pokemon(pokemon )
+            else:
+                num_pokemon_found =0
             
             time.sleep(.5)
             
