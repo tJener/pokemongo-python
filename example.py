@@ -66,9 +66,11 @@ if __name__ == '__main__':
             # Get profile
             print(client.get_profile())
 
-            # Find pokemon
-            for pokemon in client.find_pokemon(bounds):
-                print(pokemon)
+            while True:
+                # Find pokemon
+                for pokemon in client.find_pokemon(bounds):
+                    print(pokemon)
+
         except Exception as e:
             print("Exception: {0} {1}".format(e.message, e.args))
             time.sleep(1)

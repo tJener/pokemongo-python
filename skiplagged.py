@@ -28,6 +28,7 @@ class Skiplagged():
     _auth_provider = None
 
     def __init__(self):
+        self._last_skiplagged_request = 0
         self._requests_skiplagged_session = get_requests_session('pokemongo-python')
         self._requests_niantic_session = get_requests_session('Niantic App')
 
@@ -87,8 +88,16 @@ class Skiplagged():
         while 1:
             try:
                 if is_skiplagged_api:
-                    r = requests_session.post(endpoint, data, verify=False)
-                    return json.loads(r.content)
+                    while True:
+                        now = time.time()
+                        diff = now - self._last_skiplagged_request
+                        if diff <= 1.1:
+                            time.sleep(max(1 - diff, 0))
+                        r = requests_session.post(endpoint, data, verify=False)
+                        self._last_skiplagged_request = time.time()
+                        response = json.loads(r.content)
+                        if not ('error' in response and 'rate limit' in response['error']):
+                            return response
                 else:
                     r = requests_session.post(endpoint, base64.b64decode(data), verify=False)
                     if 'Server Error' in r.content: raise Exception('invalid niantic server response')
@@ -171,7 +180,7 @@ class Skiplagged():
             if 'pokemons' in response:
                 num_pokemon_found = len(response['pokemons'])
                 if num_pokemon_found > 0: print getMyTime(), "found %d pokemon" % (num_pokemon_found)
-                for pokemon in response['pokemons']: yield Pokemon(pokemon )
+                for pokemon in response['pokemons']: yield Pokemon(pokemon)
             else:
                 num_pokemon_found = 0
 
