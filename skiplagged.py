@@ -172,9 +172,15 @@ class Skiplagged():
                                                     })
         if not 'requests' in response: raise Exception('failed to get requests')
 
+        last_request = 0
+
         for request in response['requests']:
             print getMyTime(), "moving player"
+            diff = time.time() - last_request
+            if diff <= 5.5:
+                time.sleep(max(0, 5.5 - diff))
             pokemon_data = self._call(self.SPECIFIC_API, request['pdata'])
+            last_request = time.time()
             response = self._call(self.SKIPLAGGED_API, {'pdata': pokemon_data})
 
             if 'pokemons' in response:
